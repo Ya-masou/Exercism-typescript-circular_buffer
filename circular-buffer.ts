@@ -4,14 +4,12 @@ export class BufferEmptyError extends Error {}
 export default class CircularBuffer<T> {
   bufferSize: number
   buffer: (T | undefined)[]
-  readPosition: number
-  writePosition: number
+  readPosition = 0
+  writePosition = 0
 
   constructor(bufferSize: number) {
     this.bufferSize = bufferSize
-    this.buffer = new Array(this.bufferSize)
-    this.readPosition = 0
-    this.writePosition = 0
+    this.buffer = this.createInitialBuffer()
   }
 
   read(): T | undefined {
@@ -39,9 +37,13 @@ export default class CircularBuffer<T> {
   }
 
   clear(): void {
-    this.buffer = new Array(this.bufferSize)
+    this.buffer = this.createInitialBuffer()
     this.readPosition = 0
     this.writePosition = 0
+  }
+
+  private createInitialBuffer(): T[] {
+    return new Array(this.bufferSize)
   }
 
   private bufferIsEmpty(): boolean {
@@ -53,15 +55,11 @@ export default class CircularBuffer<T> {
   }
 
   private nextReadPosition(): number {
-    if (this.readPosition === (this.bufferSize - 1)) return 0
-
-    return this.readPosition + 1
+    return this.readPosition === (this.bufferSize - 1) ? 0 : this.readPosition + 1
   }
 
   private nextWritePosition(): number {
-    if (this.writePosition === (this.bufferSize - 1)) return 0
-
-    return this.writePosition + 1
+    return this.writePosition === (this.bufferSize - 1) ? 0 : this.writePosition + 1
   }
 }
 
